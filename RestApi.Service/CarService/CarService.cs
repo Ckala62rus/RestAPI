@@ -1,9 +1,7 @@
 ﻿using RestApi.DAL.Interfaces;
 using RestApi.Domain.Entity;
-using System;
+using Serilog;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RestApi.Service.CarService
@@ -19,6 +17,7 @@ namespace RestApi.Service.CarService
 
         public async Task<List<Car>> GetCars()
         {
+            Log.Information("Get and return all cars");
             return await _carRepository.Select();
         }
 
@@ -43,6 +42,11 @@ namespace RestApi.Service.CarService
             await _carRepository.Update(entity);
             return entity;
 
+        }
+
+        public Car GetCarByName(string name)
+        {
+            return _carRepository.GetByName(name);
         }
     }
 }

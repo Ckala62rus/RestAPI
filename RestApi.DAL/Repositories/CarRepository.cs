@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestApi.DAL.Interfaces;
 using RestApi.Domain.Entity;
-using RestApi.Domain.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RestApi.DAL.Repositories
@@ -53,6 +51,13 @@ namespace RestApi.DAL.Repositories
             _db.Car.Update(entity);
             await _db.SaveChangesAsync();
             return entity;
+        }
+
+        public async Task<List<Car>> CarByPrice()
+        {
+            return await (from car in _db.Car
+                       where car.Price != 0
+                       select car).ToListAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
 using RestApi.DAL;
 using RestApi.DAL.Interfaces;
@@ -19,7 +20,9 @@ namespace RestApi.Tests
         public TestExample()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("TESTDB");
+                .UseInMemoryDatabase("TESTDB")
+                .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+
             var _context = new ApplicationDbContext(optionsBuilder.Options);
             _context.Database.EnsureDeleted();
             
@@ -78,6 +81,77 @@ namespace RestApi.Tests
             Assert.NotEmpty(actual);
         }
 
+        [Fact]
+        public async Task DeleteCarTest()
+        {
+            // arrange
+
+            var car = GetCarObject();
+
+            // act
+
+            _carService.Create(car);
+            _carService.Delete(car);
+            var expected = await _carService.GetCar(car.Id);
+
+            // assert
+
+            Assert.Equal(1, car.Id);
+            Assert.Null(expected);
+        }
+        
+        [Fact]
+        public async void UpdateCarTest()
+        {
+            // arrange
+
+            _carService.Create(GetCarObject());
+            var car = await _carService.GetCar(1);
+
+            // act
+
+            car.Description = "Some text";
+            await _carService.Update(car);
+
+            // assert
+
+            Assert.Contains("Some text", car.Description);
+        }
+
+        [Fact]
+        public async void GetCarByNameIfExistInDatabase()
+        {
+            // arrange
+
+            var cars = await GetCarMock();
+
+            foreach (var car in cars)
+            {
+                _carService.Create(car);
+            }
+
+            // act
+
+            var expected = _carService.GetCarByName("Mazda");
+
+            // assert
+
+            Assert.Equal("Mazda", expected.Name);
+            Assert.Equal(2, expected.Id);
+        }
+
+        public Car GetCarObject()
+        {
+            return new Car
+            {
+                Name = "BMW",
+                Model = "X5",
+                DateCreate = DateTime.Now,
+                Speed = 250,
+                TypeCar = TypeCar.Sedan
+            };
+        }
+
         public async Task<List<Car>> GetCarMock()
         {
             var car = new Car
@@ -108,3 +182,4 @@ namespace RestApi.Tests
         }
     }
 } 
+ 

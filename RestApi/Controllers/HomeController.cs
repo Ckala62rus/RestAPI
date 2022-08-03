@@ -4,11 +4,14 @@ using RestApi.DAL.Interfaces;
 using RestApi.Domain.Entity;
 using RestApi.Models;
 using RestApi.Service.CarService;
+using Serilog;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace RestApi.Controllers
 {
+    //[Route("api/[controller]")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -34,6 +37,7 @@ namespace RestApi.Controllers
             return Json(car);
         }
 
+        //[HttpGet("car")]
         public async Task<IActionResult> Index()
         {
             //var newCar = new Car
@@ -57,9 +61,24 @@ namespace RestApi.Controllers
 
             //var cars = await _carRepository.Select();
 
+            try
+            {
+                var msg = "start loggin. HomeController - Action Index";
+                Log.Information($"{msg}");
+
+                var cars = await _carService.GetCars();
+
+                Log.Information($"Count records from database ({cars.Count})");
+            } 
+            catch (Exception ex)
+            {
+                Log.Fatal(ex.Message);
+            }
+            
             return View();
         }
 
+        //[HttpGet("privacy")]
         public IActionResult Privacy()
         {
             return View();
