@@ -69,10 +69,13 @@ namespace RestApi.Controllers
                 var cars = await _carService.GetCars();
 
                 Log.Information($"Count records from database ({cars.Count})");
+                var a = 1;
+                var b = 0;
+                var c = a / b;
             } 
             catch (Exception ex)
             {
-                Log.Fatal(ex.Message);
+                Log.Fatal(ex.ToString() + "\n");
             }
             
             return View();

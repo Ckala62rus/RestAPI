@@ -39,6 +39,7 @@ namespace RestApi.DAL.Repositories
         public Car GetByName(string name)
         {
             return _db.Car.FirstOrDefault(x => x.Name == name);
+            //return _db.Car.FirstOrDefault(x => x.Name != name);
         }
 
         public async Task<List<Car>> Select()
